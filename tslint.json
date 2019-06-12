@@ -6,12 +6,18 @@
     "jsRules": {},
     "rules": {
         "no-unused-variable": true,
-        "max-line-length": [true, 100],
+        "max-line-length": [
+            true,
+            100
+        ],
         "object-shorthand-properties-first": false,
         "radix": false,
         "ter-arrow-parens": false,
-        "quotemark": [true, "single"],
-        "max-classes-per-file": false{}
+        "quotemark": [
+            true,
+            "single"
+        ],
+        "max-classes-per-file": false
     },
     "rulesDirectory": []
 }

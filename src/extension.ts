@@ -67,13 +67,13 @@ class IndentationRule {
 
   public constructor(config: IIndentationRuleConfig) {
     this.unIndentedLinePattern =
-        this.createRegExp(config && config.unIndentedLinePattern);
+      this.createRegExp(config && config.unIndentedLinePattern);
     this.increaseIndentPattern =
-        this.createRegExp(config && config.increaseIndentPattern);
+      this.createRegExp(config && config.increaseIndentPattern);
     this.decreaseIndentPattern =
-        this.createRegExp(config && config.decreaseIndentPattern);
+      this.createRegExp(config && config.decreaseIndentPattern);
     this.indentNextLinePattern =
-        this.createRegExp(config && config.indentNextLinePattern);
+      this.createRegExp(config && config.indentNextLinePattern);
   }
 
   public testUnIndentedLinePattern(line: string): boolean {
@@ -93,7 +93,7 @@ class IndentationRule {
   }
 
   public estimateIndentAction(validPreviousLine: string, currentLine: string):
-      vscode.IndentAction {
+    vscode.IndentAction {
     let nextIndentLevel: number = 0;
     let ruleMatched: boolean = false;
     if (this.testUnIndentedLinePattern(validPreviousLine)) {
@@ -148,13 +148,13 @@ const ADDITIONAL_CONFIGURATION_FOR_LANGUAGE: {
   python: {
     indentationRules: {
       increaseIndentPattern:
-          '^\\s*(?:def|class|for|if|elif|else|while|try|with|finally|except|async).*?:\\s*$',
+        '^\\s*(?:def|class|for|if|elif|else|while|try|with|finally|except|async).*?:\\s*$',
     },
   },
   html: {
     indentationRules: {
       increaseIndentPattern:
-          '<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|link|meta|param)\\b|[^>]*\\/>)([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*<\\/\\1>)|<!--(?!.*-->)|\\{[^}"\']*$',
+        '<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|link|meta|param)\\b|[^>]*\\/>)([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*<\\/\\1>)|<!--(?!.*-->)|\\{[^}"\']*$',
       decreaseIndentPattern: '^\\s*(<\\/(?!html)[-_\\.A-Za-z0-9]+\\b[^>]*>|-->|\\})',
     },
     // TODO: support onEnterRules
@@ -168,47 +168,47 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the impleme<ntation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
   const reindentCurrentLineCommand =
-      vscode.commands.registerCommand('emacs-tab.reindentCurrentLine', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-          vscode.window.showInformationMessage('No editor');
-          return;
-        }
-        const documentLanguageId: string = editor.document.languageId;
-        const langConfig = getLanguageConfiguration(documentLanguageId);
-        if (!langConfig) {
-          vscode.window.showInformationMessage(
-              `no language config for ${documentLanguageId}`);
-          return;
-        }
-        const [previousValidLine, currentLine] =
-            getPreviousAndCurrentLine(editor);
-        const indent =
-            estimateIndentAction(previousValidLine, currentLine, langConfig);
-        reindentCurrentLine(indent, previousValidLine, currentLine);
-      });
+    vscode.commands.registerCommand('emacs-tab.reindentCurrentLine', () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showInformationMessage('No editor');
+        return;
+      }
+      const documentLanguageId: string = editor.document.languageId;
+      const langConfig = getLanguageConfiguration(documentLanguageId);
+      if (!langConfig) {
+        vscode.window.showInformationMessage(
+          `no language config for ${documentLanguageId}`);
+        return;
+      }
+      const [previousValidLine, currentLine] =
+        getPreviousAndCurrentLine(editor);
+      const indent =
+        estimateIndentAction(previousValidLine, currentLine, langConfig);
+      reindentCurrentLine(indent, previousValidLine, currentLine);
+    });
 
   const debugEstimateIndentLevel = vscode.commands.registerCommand(
-      'emacs-tab.debugEstimateIndentLevel', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-          vscode.window.showInformationMessage('No editor');
-          return;
-        }
-        const documentLanguageId: string = editor.document.languageId;
-        const langConfig = getLanguageConfiguration(documentLanguageId);
-        if (!langConfig) {
-          vscode.window.showInformationMessage(
-              `no language config for ${documentLanguageId}`);
-          return;
-        }
-        const [previousValidLine, currentLine] =
-            getPreviousAndCurrentLine(editor);
-        const indent =
-            estimateIndentAction(previousValidLine, currentLine, langConfig);
+    'emacs-tab.debugEstimateIndentLevel', () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showInformationMessage('No editor');
+        return;
+      }
+      const documentLanguageId: string = editor.document.languageId;
+      const langConfig = getLanguageConfiguration(documentLanguageId);
+      if (!langConfig) {
         vscode.window.showInformationMessage(
-            convertIndentActionToString(indent));
-      });
+          `no language config for ${documentLanguageId}`);
+        return;
+      }
+      const [previousValidLine, currentLine] =
+        getPreviousAndCurrentLine(editor);
+      const indent =
+        estimateIndentAction(previousValidLine, currentLine, langConfig);
+      vscode.window.showInformationMessage(
+        convertIndentActionToString(indent));
+    });
   context.subscriptions.push(reindentCurrentLineCommand);
 }
 
@@ -234,13 +234,9 @@ function convertIndentActionToString(action: vscode.IndentAction): string {
  * @return {string[]} pair of the valid previous line and current line
  */
 function getPreviousAndCurrentLine(editor: vscode.TextEditor): string[] {
-  if (!editor.selection.isEmpty) {
-    return [null, null];
-  }
-
   const currentPosition = editor.selection.active;
   const document = editor.document;
-  const allLinesArray = document.getText().split('\n');
+  const allLinesArray = document.getText().split(document.eol == vscode.EndOfLine.CRLF ? '\r\n' : '\n');
   const currentLine = allLinesArray[currentPosition.line];
   if (currentPosition.line === 0) {
     // first line, do nothing
@@ -249,13 +245,13 @@ function getPreviousAndCurrentLine(editor: vscode.TextEditor): string[] {
   // Lookup valid previous line because the line consisted of white spaces gives
   // no effect on indentation.
   const validPreviousLine =
-      getValidPreviousLine(allLinesArray, currentPosition.line);
+    getValidPreviousLine(allLinesArray, currentPosition.line);
   return [validPreviousLine, currentLine];
 }
 
 function mergeLanguageConfiguration(
-    a: ILanguageConfiguration,
-    b: ILanguageConfiguration): ILanguageConfiguration {
+  a: ILanguageConfiguration,
+  b: ILanguageConfiguration): ILanguageConfiguration {
   const mergedConfiguration: ILanguageConfiguration = {
     indentationRules: undefined,
     brackets: [],
@@ -263,7 +259,7 @@ function mergeLanguageConfiguration(
   };
   if (a.indentationRules) {
     mergedConfiguration.indentationRules =
-        Object.assign({}, a.indentationRules, b.indentationRules);
+      Object.assign({}, a.indentationRules, b.indentationRules);
   } else {
     mergedConfiguration.indentationRules = b.indentationRules;
   }
@@ -274,7 +270,7 @@ function mergeLanguageConfiguration(
   }
   if (a.onEnterRules) {
     mergedConfiguration.onEnterRules =
-        a.onEnterRules.concat(b.onEnterRules || []);
+      a.onEnterRules.concat(b.onEnterRules || []);
   } else {
     mergedConfiguration.onEnterRules = b.onEnterRules;
   }
@@ -291,20 +287,20 @@ function getLanguageConfiguration(id: string): ILanguageConfiguration {
   let additionalConfiguration = {};
   if (documentLanguageId in ADDITIONAL_CONFIGURATION_FOR_LANGUAGE) {
     additionalConfiguration =
-        ADDITIONAL_CONFIGURATION_FOR_LANGUAGE[documentLanguageId];
+      ADDITIONAL_CONFIGURATION_FOR_LANGUAGE[documentLanguageId];
   }
   // walk through all the extensions
   for (const ext of vscode.extensions.all) {
     if (ext.packageJSON && ext.packageJSON.contributes &&
-        ext.packageJSON.contributes.languages) {
+      ext.packageJSON.contributes.languages) {
       const packageLangData = ext.packageJSON.contributes.languages.find(
-          (langData) => (langData.id === documentLanguageId));
+        (langData) => (langData.id === documentLanguageId));
       if (packageLangData) {
         const langConfigFilepath =
-            path.join(ext.extensionPath, packageLangData.configuration);
+          path.join(ext.extensionPath, packageLangData.configuration);
         return mergeLanguageConfiguration(
-            json.parse(fs.readFileSync(langConfigFilepath).toString()),
-            additionalConfiguration);
+          json.parse(fs.readFileSync(langConfigFilepath).toString()),
+          additionalConfiguration);
       }
     }
   }
@@ -312,8 +308,8 @@ function getLanguageConfiguration(id: string): ILanguageConfiguration {
 }
 
 function estimateIndentAction(
-    validPreviousLine: string, currentLine: string,
-    languageConfiguration: ILanguageConfiguration): vscode.IndentAction {
+  validPreviousLine: string, currentLine: string,
+  languageConfiguration: ILanguageConfiguration): vscode.IndentAction {
   if (validPreviousLine == null) {
     return vscode.IndentAction.None;
   }
@@ -322,9 +318,9 @@ function estimateIndentAction(
   const currentLineWihtoutLeadingWhitespaces = currentLine.replace(/^\s*/, '');
   // 0 indentPattern
   const indentationRule =
-      new IndentationRule(languageConfiguration.indentationRules);
+    new IndentationRule(languageConfiguration.indentationRules);
   const indentationRuleIndentAction =
-      indentationRule.estimateIndentAction(validPreviousLine, currentLine);
+    indentationRule.estimateIndentAction(validPreviousLine, currentLine);
   if (indentationRuleIndentAction != null) {
     return indentationRuleIndentAction;
   }
@@ -345,11 +341,11 @@ function estimateIndentAction(
 
   // 2 special indent-outdent
   if (validPreviousLine.length > 0 &&
-      currentLineWihtoutLeadingWhitespaces.length > 0) {
+    currentLineWihtoutLeadingWhitespaces.length > 0) {
     for (const bracketConfig of bracketsArray) {
       const bracket = new BracketRule(bracketConfig);
       if (bracket.openRegExp.test(validPreviousLine) &&
-          bracket.closeRegExp.test(currentLineWihtoutLeadingWhitespaces)) {
+        bracket.closeRegExp.test(currentLineWihtoutLeadingWhitespaces)) {
         return vscode.IndentAction.IndentOutdent;
       }
     }
@@ -410,16 +406,14 @@ function createCloseBracketRegExp(closeBracket: string): RegExp {
 }
 
 function getTabSize(): number {
-  // TODO: estimate from content
-  return vscode.workspace.getConfiguration('editor').tabSize;
+  return vscode.window.activeTextEditor.options.tabSize as number;
 }
 
 /**
  * @return {boolean} true if hard tab is configured.
  */
 function isUsingHardTab(): boolean {
-  // TODO: estimate from content
-  return !vscode.workspace.getConfiguration('editor').insertSpaces;
+  return !vscode.window.activeTextEditor.options.insertSpaces;
 }
 
 /**
@@ -440,7 +434,7 @@ function countIndent(indentLine: string, tabSize: number): number {
  * @return {string}
  */
 function convertIndentLevelToString(
-    indentLevel: number, tabSize: number): string {
+  indentLevel: number, tabSize: number): string {
   if (isUsingHardTab()) {
     return new Array(1 + indentLevel).join('\t');
   } else {
@@ -454,16 +448,17 @@ function convertIndentLevelToString(
  * @param onEnterRulesArray
  */
 export function reindentCurrentLine(
-    indentAction: vscode.IndentAction, validPreviousLine: string,
-    currentLine: string): void {
+  indentAction: vscode.IndentAction, validPreviousLine: string,
+  currentLine: string): void {
   const tabSize = getTabSize();
+
   const editor = vscode.window.activeTextEditor;
   const currentPosition = editor.selection.active;
   const document = editor.document;
 
   const previousIndent = getIndent(validPreviousLine);
   const beforeIndentCurrentIndent =
-      countIndent(getIndent(currentLine), tabSize);
+    countIndent(getIndent(currentLine), tabSize);
   const beforeIndentCurrentIndentNative = getIndent(currentLine).length;
   const currentLineWihtoutLeadingWhitespaces = currentLine.replace(/^\s*/, '');
 
@@ -483,14 +478,14 @@ export function reindentCurrentLine(
   const beforeIndentCursorPositionCharacter = currentPosition.character;
   if (idealIndent !== beforeIndentCurrentIndent) {
     const indentedCurrentLine = indentLine(
-        currentLine, idealIndent, previousIndent,
-        countIndent(previousIndent, tabSize), tabSize);
+      currentLine, idealIndent, previousIndent,
+      countIndent(previousIndent, tabSize), tabSize);
     vscode.window.activeTextEditor.edit((edit) => {
       const startPosition = new vscode.Position(currentPosition.line, 0);
       const endPosition =
-          new vscode.Position(currentPosition.line, currentLine.length);
+        new vscode.Position(currentPosition.line, currentLine.length);
       edit.replace(
-          new vscode.Range(startPosition, endPosition), indentedCurrentLine);
+        new vscode.Range(startPosition, endPosition), indentedCurrentLine);
     });
   }
 
@@ -499,24 +494,24 @@ export function reindentCurrentLine(
     // move to the first character of the line
     const nativeCharacterTabSize = isUsingHardTab() ? 1 : tabSize;
     const nextPosition = new vscode.Position(
-        currentPosition.line, idealIndent * nativeCharacterTabSize);
+      currentPosition.line, idealIndent * nativeCharacterTabSize);
     editor.selection = new vscode.Selection(nextPosition, nextPosition);
   } else if (idealIndent !== beforeIndentCurrentIndent) {
     const cursorMovement = (idealIndent - beforeIndentCurrentIndent) * tabSize;
     const nextPosition = new vscode.Position(
-        currentPosition.line,
-        cursorMovement + beforeIndentCursorPositionCharacter);
+      currentPosition.line,
+      cursorMovement + beforeIndentCursorPositionCharacter);
     editor.selection = new vscode.Selection(nextPosition, nextPosition);
   }
 }
 
 function getValidPreviousLine(
-    allLinesArray: string[], currentLine: number): string {
+  allLinesArray: string[], currentLine: number): string {
   const isAllWhiteSpacesRegexp = /^\s*$/;
   for (let previousLine = currentLine - 1; previousLine >= 0; --previousLine) {
     const previousLineContent = allLinesArray[previousLine];
     if (previousLineContent.length > 0 &&
-        !isAllWhiteSpacesRegexp.test(previousLineContent)) {
+      !isAllWhiteSpacesRegexp.test(previousLineContent)) {
       return previousLineContent;
     }
   }
@@ -524,8 +519,8 @@ function getValidPreviousLine(
 }
 
 function indentLine(
-    line: string, indentLevel: number, previousIndent: string,
-    previousIndentLevel: number, tabSize: number): string {
+  line: string, indentLevel: number, previousIndent: string,
+  previousIndentLevel: number, tabSize: number): string {
   const withoutLeadingWhiteSpacesLine = line.replace(/^[\s]*/, '');
   if (previousIndentLevel == indentLevel) {
     // If no need to change indent level, just use exactly the same indent to
